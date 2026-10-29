@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Deportes vs. Estudio</title>
+
+<style>
+body {
+  font-family: Arial, sans-serif;
+  background: linear-gradient(135deg, #071c3a, #087f5b);
+  color: white;
+  text-align: center;
+  margin: 0;
+  padding: 20px;
+}
+.container {
+  max-width: 600px;
+  margin: auto;
+  background: white;
+  color: #172b4d;
+  padding: 25px;
+  border-radius: 20px;
+  box-shadow: 0 5px 20px #0005;
+}
+h1 { color: #087f5b; }
+button {
+  display: block;
+  width: 100%;
+  padding: 14px;
+  margin: 10px 0;
+  border: none;
+  border-radius: 12px;
+  background: #087f5b;
+  color: white;
+  font-size: 16px;
+  cursor: pointer;
+}
+button:hover { background: #065f46; }
+#progress { color: #087f5b; font-weight: bold; }
+.hidden { display: none; }
+.small { font-size: 13px; color: #555; }
+</style>
+</head>
+
+<body>
+<div class="container">
+  <h1>⚽ DEPORTES VS. 📚 ESTUDIO</h1>
+  <p>¿Cuánto sabés sobre la relación entre la actividad física y el rendimiento académico?</p>
+
+  <div id="start">
+    <p>Respondé 8 preguntas y descubrí cuánto sabés.</p>
+    <button onclick="startGame()">¡EMPEZAR EL JUEGO!</button>
+  </div>
+
+  <div id="game" class="hidden">
+    <p id="progress"></p>
+    <h2 id="question"></h2>
+    <div id="answers"></div>
+    <p id="feedback"></p>
+  </div>
+
+  <div id="result" class="hidden">
+    <h2>🏆 ¡Terminaste!</h2>
+    <h3 id="score"></h3>
+    <p id="message"></p>
+    <button onclick="location.reload()">VOLVER A JUGAR</button>
+  </div>
+
+  <hr>
+  <p class="small">Feria educativa | Deportes y rendimiento académico</p>
+</div>
+
+<script>
+const questions = [
+  {
+    q: "1. ¿La actividad física puede ayudar a mejorar la concentración?",
+    a: ["Sí, puede favorecerla", "No, siempre la empeora", "No tiene ninguna relación"],
+    c: 0,
+    e: "La actividad física puede favorecer la atención y algunas funciones cognitivas."
+  },
+  {
+    q: "2. ¿Hacer deporte significa necesariamente sacar mejores notas?",
+    a: ["Sí, siempre", "No, depende de varios factores", "Sí, sin estudiar"],
+    c: 1,
+    e: "El deporte puede ayudar, pero las notas también dependen del estudio, el descanso y otros factores."
+  },
+  {
+    q: "3. ¿Qué puede pasar cuando hacemos ejercicio regularmente?",
+    a: ["Puede mejorar nuestro bienestar", "Dejamos de necesitar dormir", "Ya no necesitamos estudiar"],
+    c: 0,
+    e: "La actividad física regular puede mejorar el bienestar físico y mental."
+  },
+  {
+    q: "4. ¿Dormir bien es importante para estudiar?",
+    a: ["No", "Solo antes de un examen", "Sí, ayuda a la memoria y la atención"],
+    c: 2,
+    e: "El sueño es fundamental para la memoria, el aprendizaje y la concentración."
+  },
+  {
+    q: "5. ¿Qué es mejor para combinar estudio y deporte?",
+    a: ["Organizar los horarios", "Dejar de dormir para entrenar", "No estudiar nunca"],
+    c: 0,
+    e: "La organización permite distribuir mejor el tiempo entre las responsabilidades y el ejercicio."
+  },
+  {
+    q: "6. ¿El ejercicio puede ayudar a reducir el estrés?",
+    a: ["Nunca", "Sí, puede ayudar", "Solo en deportistas profesionales"],
+    c: 1,
+    e: "La actividad física puede contribuir a reducir el estrés y mejorar el estado de ánimo."
+  },
+  {
+    q: "7. ¿Qué puede perjudicar el rendimiento académico?",
+    a: ["Dormir lo suficiente", "Organizarse bien", "Dormir poco y no descansar"],
+    c: 2,
+    e: "La falta de sueño puede afectar la atención, la memoria y el aprendizaje."
+  },
+  {
+    q: "8. ¿Hay que elegir entre estudiar y hacer deporte?",
+    a: ["Sí, son incompatibles", "No, se pueden combinar con organización", "Sí, siempre hay que abandonar uno"],
+    c: 1,
+    e: "Ambas actividades pueden formar parte de una rutina equilibrada."
+  }
+];
+
+let current = 0;
+let points = 0;
+
+function startGame() {
+  document.getElementById("start").classList.add("hidden");
+  document.getElementById("game").classList.remove("hidden");
+  showQuestion();
+}
+
+function showQuestion() {
+  document.getElementById("feedback").textContent = "";
+  document.getElementById("progress").textContent =
+    "Pregunta " + (current + 1) + " de " + questions.length;
+
+  document.getElementById("question").textContent = questions[current].q;
+  const box = document.getElementById("answers");
+  box.innerHTML = "";
+
+  questions[current].a.forEach((answer, index) => {
+    const button = document.createElement("button");
+    button.textContent = answer;
+    button.onclick = () => answerQuestion(index);
+    box.appendChild(button);
+  });
+}
+
+function answerQuestion(index) {
+  const q = questions[current];
+  if (index === q.c) points++;
+
+  document.getElementById("feedback").textContent =
+    (index === q.c ? "✅ ¡Correcto! " : "❌ No exactamente. ") + q.e;
+
+  const buttons = document.querySelectorAll("#answers button");
+  buttons.forEach(button => button.disabled = true);
+
+  const next = document.createElement("button");
+  next.textContent = current === questions.length - 1
+    ? "VER MI RESULTADO"
+    : "SIGUIENTE PREGUNTA";
+
+  next.onclick = () => {
+    current++;
+    if (current < questions.length) {
+      showQuestion();
+    } else {
+      showResult();
+    }
+  };
+
+  document.getElementById("answers").appendChild(next);
+}
+
+function showResult() {
+  document.getElementById("game").classList.add("hidden");
+  document.getElementById("result").classList.remove("hidden");
+
+  document.getElementById("score").textContent =
+    "Tu puntaje: " + points + " de " + questions.length;
+
+  let message;
+  if (points >= 7) {
+    message = "¡Excelente! 🏆 Sabés mucho sobre deporte, descanso y estudio.";
+  } else if (points >= 4) {
+    message = "¡Bien! 💪 Conocés varios beneficios, pero todavía podés aprender más.";
+  } else {
+    message = "¡A seguir aprendiendo! 📚⚽ Cada respuesta es una oportunidad para descubrir algo nuevo.";
+  }
+
+  document.getElementById("message").textContent = message;
+}
+</script>
+</body>
+</html>
